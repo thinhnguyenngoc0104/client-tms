@@ -1,8 +1,8 @@
 // Auth0 configuration
 export const auth0Config = {
-  domain: import.meta.env.REACT_APP_AUTH0_DOMAIN || 'dev-lkz2wcgwo6lpx8r8.us.auth0.com',
-  clientId: import.meta.env.REACT_APP_AUTH0_CLIENT_ID || 'OXrubMllBqPDTMse1LPWmLJdkcZOFPJI',
+  domain: import.meta.env.REACT_APP_AUTH0_DOMAIN,
+  clientId: import.meta.env.REACT_APP_AUTH0_CLIENT_ID,
   redirectUri: window.location.origin,
-  audience: import.meta.env.REACT_APP_AUTH0_AUDIENCE || 'https://tms-api',
+  audience: import.meta.env.REACT_APP_AUTH0_AUDIENCE,
   scope: 'openid profile email'
 };
