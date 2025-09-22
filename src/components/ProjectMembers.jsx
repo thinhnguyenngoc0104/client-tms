@@ -60,7 +60,7 @@ const ProjectMembers = ({ projectId, isVisible, onClose, onUpdate}) => {
   };
 
   const availableUsers = users.filter(user =>
-    !members.some(member => member.id === user.id) && user.email !== 'thinh@gmail.com'
+    !members.some(member => member.id === user.id) && user.email !== 'ADMIN'
   );
 
   if (!isVisible) return null;  
