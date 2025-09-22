@@ -31,30 +31,6 @@ const ProjectBoard = () => {
     assigneeId: 0
   });
 
-  useEffect(() => {
-    if (projectId && user) {
-      // Fetch all necessary data when component mounts
-      actions.fetchTasksByProject(projectId);
-      actions.fetchUsers(); // Ensure users are loaded for assignee dropdown
-
-      // Fetch project members for assignee dropdown
-      fetchProjectMembers();
-
-      // Always fetch projects to ensure we have the latest data
-      actions.fetchProjects();
-    }
-  }, [projectId, user?.id]); // Only depend on user.id to prevent infinite loops
-
-  // Separate effect to set current project when projects are loaded
-  useEffect(() => {
-    if (projectId && state.projects.length > 0) {
-      const project = state.projects.find(p => p.id === parseInt(projectId));
-      if (project && (!currentProject || currentProject.id !== project.id)) {
-        actions.setCurrentProject(project);
-      }
-    }
-  }, [projectId, state.projects.length, currentProject?.id]); // Use specific properties to prevent loops
-
   const fetchProjectMembers = async () => {
     if (!projectId) return;
     try {
@@ -64,6 +40,35 @@ const ProjectBoard = () => {
       console.error('Error fetching project members:', error);
     }
   };
+
+  console.log(tasks)
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchData = async () => {
+      await actions.fetchProjects();
+      await actions.fetchTasksByProject(projectId);
+      await fetchProjectMembers();
+    };
+
+    fetchData();
+  }, [projectId]); // Only run when project id changed
+
+  // set current project but don't depends on currentProject to prevent loop
+  useEffect(() => {
+    if (!projectId || !state.projects.length) return;
+
+    const project = state.projects.find(p => p.id === parseInt(projectId));
+    if (project && (!currentProject || currentProject.id !== project.id)) {
+      actions.setCurrentProject(project);
+    }
+  }, [projectId, state.projects]);
+
+  // loading check
+  if (!user) return <Loading message="Loading user data..." />;
+  if (loading && tasks.length === 0) return <Loading message="Loading tasks..." />;
+  if (!currentProject) return <Loading message="Loading project..." />;
 
   const handleTaskDrop = async (taskId, newStatus) => {
     try {
@@ -110,14 +115,6 @@ const ProjectBoard = () => {
     { title: 'DONE', status: 'DONE', tasks: getTasksByStatus('DONE') }
   ];
 
-  if (loading && tasks.length === 0) {
-    return <Loading message="Loading project board..." />;
-  }
-
-  if (!user) {
-    return <Loading message="Loading user data..." />;
-  }
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="project-board">
@@ -130,7 +127,7 @@ const ProjectBoard = () => {
               <ArrowLeft size={18} />
               Back to Projects
             </button>
-            
+
             {currentProject && (
               <div className="project-info">
                 <h1>{currentProject?.name}</h1>
@@ -140,14 +137,14 @@ const ProjectBoard = () => {
               </div>
             )}
           </div>
-          
+
           <div className="project-board-actions">
             <button
               className="create-task-btn"
               onClick={() => setShowCreateTaskModal(true)}
             >
               <Plus size={18} />
-              Add Task
+              Task
             </button>
 
             {currentProject && (
@@ -210,7 +207,7 @@ const ProjectBoard = () => {
                 placeholder="Enter task title"
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="task-description">Description</label>
               <textarea
@@ -221,7 +218,7 @@ const ProjectBoard = () => {
                 rows={4}
               />
             </div>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="task-status">Status</label>
@@ -248,7 +245,7 @@ const ProjectBoard = () => {
                   <option value="HIGH">HIGH</option>
                 </select>
               </div>
-              
+
               {isAdmin && (
                 <div className="form-group">
                   <label htmlFor="task-assignee">Assignee *</label>
@@ -272,10 +269,10 @@ const ProjectBoard = () => {
 
             </div>
             {!isAdmin && (
-                <div className="assignee-notice">
-                  <p>This task will be assigned to you automatically.</p>
-                </div>
-              )}
+              <div className="assignee-notice">
+                <p>This task will be assigned to you automatically.</p>
+              </div>
+            )}
             <div className="form-actions">
               <button
                 type="button"
@@ -315,7 +312,10 @@ const ProjectBoard = () => {
         <ProjectMembers
           projectId={projectId}
           isVisible={showMembersModal}
-          onClose={() => setShowMembersModal(false)}
+          onClose={() => {
+            setShowMembersModal(false);
+            fetchProjectMembers();
+          }}
           onUpdate={(projectRemoved) => actions.fetchTasksByProject(projectRemoved)}
         />
 

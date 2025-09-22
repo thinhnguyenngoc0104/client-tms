@@ -20,6 +20,7 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
   const canEdit = task ? actions.canUpdateTask(task) : false;
   const canDelete = task ? actions.canDeleteTask(task) : false;
   const isAdmin = actions.isAdmin();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (task && isVisible) {
@@ -59,10 +60,6 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
 
   const handleDelete = async () => {
     if (!task?.id) return;
-    
-    if (!window.confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
 
     try {
       setLoading(true);
@@ -123,13 +120,13 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
       <div className="task-detail">
         <div className="task-header">
           <div className="task-meta">
-            <span 
+            <span
               className="task-status"
               style={{ backgroundColor: getStatusColor(task.status) }}
             >
               {task.status?.toUpperCase()}
             </span>
-            <span 
+            <span
               className="task-priority"
               style={{ color: getPriorityColor(task.priority) }}
             >
@@ -137,7 +134,7 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
               {task.priority?.toUpperCase()}
             </span>
           </div>
-          
+
           <div className="task-actions">
             {canEdit && !isEditing && (
               <button
@@ -149,11 +146,11 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
                 Edit
               </button>
             )}
-            
+
             {canDelete && (
               <button
                 className="delete-btn"
-                onClick={handleDelete}
+                onClick={() => setShowDeleteConfirm(true)}
                 disabled={loading}
               >
                 <Trash2 size={16} />
@@ -249,7 +246,7 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
                 <X size={16} />
                 Cancel
               </button>
-              
+
               <button
                 type="button"
                 className="save-edit-btn"
@@ -264,7 +261,7 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
         ) : (
           <div className="task-content">
             <h3 className="task-title">{task.title}</h3>
-            
+
             {task.description && (
               <div className="task-description">
                 <p>{task.description}</p>
@@ -276,7 +273,7 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
                 <User size={16} />
                 <span>Assigned to: {getAssigneeName(task.assignee_id || task.assigneeId)}</span>
               </div>
-              
+
               {task.created_at && (
                 <div className="info-item">
                   <Calendar size={16} />
@@ -291,6 +288,47 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
               </div>
             )}
           </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <Modal
+            isOpen={showDeleteConfirm}
+            onClose={() => setShowDeleteConfirm(false)}
+            title="Delete Task"
+            size="small"
+          >
+            <div className="delete-confirmation">
+              <div className="delete-warning">
+                <Trash2 size={48} className="warning-icon" />
+                <h3>Are you sure you want to delete this task?</h3>
+                <p>
+                  This action cannot be undone. All data associated with
+                  "<strong>{task?.title}</strong>" will be permanently deleted.
+                </p>
+              </div>
+
+              <div className="delete-actions">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="delete-confirm-btn"
+                  onClick={handleDelete}
+                  disabled={loading}
+                >
+                  <Trash2 size={16} />
+                  {loading ? 'Deleting...' : 'Delete Task'}
+                </button>
+              </div>
+            </div>
+          </Modal>
         )}
       </div>
     </Modal>

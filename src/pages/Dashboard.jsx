@@ -18,11 +18,31 @@ const Dashboard = () => {
     name: '',
     description: ''
   });
+  const [filteredProjects, setFilteredProjects] = useState([]);
 
+  // Reset currentProject when access Dashboard
   useEffect(() => {
-    actions.fetchProjects();
-    actions.fetchUsers();
-  }, [user?.id]);
+    actions.setCurrentProject(null);
+  }, []);
+
+  // Fetch projects when user had data
+  const [fetched, setFetched] = useState(false);
+  useEffect(() => {
+    if (user && !fetched) {
+      actions.fetchProjects();
+      setFetched(true);
+    }
+  }, [user, fetched]);
+
+  // Filter projects when project or searchTeam change
+  useEffect(() => {
+    setFilteredProjects(
+      projects.filter(project =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [projects, searchTerm]);
 
   const handleProjectClick = (project) => {
     actions.setCurrentProject(project);
@@ -44,14 +64,9 @@ const Dashboard = () => {
     }
   };
 
-  const filteredProjects = projects.filter(project =>
-    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (loading && projects.length === 0) {
-    return <Loading message="Loading projects..." />;
-  }
+  // Loading checks
+  if (!user) return <Loading message="Loading user data..." />;
+  if (loading) return <Loading message="Loading projects..." />;
 
   return (
     <div className="dashboard">
@@ -60,7 +75,7 @@ const Dashboard = () => {
           <h1>Projects</h1>
           <p>Manage your projects and track progress</p>
         </div>
-        
+
         <div className="dashboard-actions">
           <div className="search-box">
             <Search size={18} />
@@ -71,7 +86,7 @@ const Dashboard = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           {isAdmin && (
             <button
               className="create-project-btn"
@@ -131,55 +146,55 @@ const Dashboard = () => {
           title="Create New Project"
           size="medium"
         >
-        <form onSubmit={handleCreateProject} className="create-project-form">
-          <div className="form-group">
-            <label htmlFor="project-name">Project Name *</label>
-            <input
-              id="project-name"
-              type="text"
-              value={newProject.name}
-              onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-              required
-              placeholder="Enter project name"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="project-description">Description</label>
-            <textarea
-              id="project-description"
-              value={newProject.description}
-              onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-              placeholder="Enter project description"
-              rows={4}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Project Owner</label>
-            <div className="owner-display">
-              {user?.name || user?.email || 'Current User'}
+          <form onSubmit={handleCreateProject} className="create-project-form">
+            <div className="form-group">
+              <label htmlFor="project-name">Project Name *</label>
+              <input
+                id="project-name"
+                type="text"
+                value={newProject.name}
+                onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+                required
+                placeholder="Enter project name"
+              />
             </div>
-            <small className="owner-note">You will be assigned as the project owner</small>
-          </div>
-          
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-btn"
-              onClick={() => setShowCreateModal(false)}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="create-btn"
-              disabled={!newProject.name.trim()}
-            >
-              Create Project
-            </button>
-          </div>
-        </form>
+
+            <div className="form-group">
+              <label htmlFor="project-description">Description</label>
+              <textarea
+                id="project-description"
+                value={newProject.description}
+                onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+                placeholder="Enter project description"
+                rows={4}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Project Owner</label>
+              <div className="owner-display">
+                {user?.name || user?.email || 'Current User'}
+              </div>
+              <small className="owner-note">You will be assigned as the project owner</small>
+            </div>
+
+            <div className="form-actions">
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setShowCreateModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="create-btn"
+                disabled={!newProject.name.trim()}
+              >
+                Create Project
+              </button>
+            </div>
+          </form>
         </Modal>
       )}
     </div>
