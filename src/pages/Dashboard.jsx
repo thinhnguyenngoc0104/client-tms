@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
-import { useApp } from '../store/AppContext';
+import { useApp } from "../store/useApp";
 import ProjectCard from '../components/ProjectCard';
 import Modal from '../components/Modal';
 import Loading from '../components/Loading';

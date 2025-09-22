@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Plus, X, UserMinus } from 'lucide-react';
-import { useApp } from '../store/AppContext';
+import { useApp } from "../store/useApp";
 import Modal from './Modal';
 import './ProjectMembers.css';
 

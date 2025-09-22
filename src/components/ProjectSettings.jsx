@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Save, X, Trash2 } from 'lucide-react';
-import { useApp } from '../store/AppContext';
+import { useApp } from "../store/useApp";
 import Modal from './Modal';
 import './ProjectSettings.css';
 

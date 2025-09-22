@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Trash2, Save, X, User, Calendar, Flag } from 'lucide-react';
-import { useApp } from '../store/AppContext';
+import { useApp } from "../store/useApp";
 import Modal from './Modal';
 import './TaskDetail.css';
 

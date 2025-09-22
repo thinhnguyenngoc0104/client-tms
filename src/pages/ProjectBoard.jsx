@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ArrowLeft, Plus, Settings, Users } from 'lucide-react';
-import { useApp } from '../store/AppContext';
+import { useApp } from "../store/useApp";
 import KanbanColumn from '../components/KanbanColumn';
 import Modal from '../components/Modal';
 import Loading from '../components/Loading';

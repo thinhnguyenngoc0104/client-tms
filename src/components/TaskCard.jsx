@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
 import { User, AlertCircle, Clock } from 'lucide-react';
-import { useApp } from '../store/AppContext';
+import { useApp } from "../store/useApp";
 import './TaskCard.css';
 
 const TaskCard = ({ task, onClick }) => {

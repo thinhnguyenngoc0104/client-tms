@@ -1,15 +1,13 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { User, Shield } from 'lucide-react';
-import { useApp } from '../store/AppContext';
-import { usePermissions } from '../hooks/usePermissions';
+import { useApp } from "../store/useApp";
 import './UserProfile.css';
 
 const UserProfile = () => {
   const { user: auth0User } = useAuth0();
   const { state } = useApp();
   const { user } = state;
-  const { getRoleDisplayName } = usePermissions();
 
   const displayUser = user || auth0User;
 
@@ -36,7 +34,7 @@ const UserProfile = () => {
         </div>
         <div className="user-email">{displayUser.email}</div>
         {displayUser.role && (
-          <div className="user-role">{getRoleDisplayName(displayUser.role)}</div>
+          <div className="user-role">{displayUser.role}</div>
         )}
       </div>
     </div>

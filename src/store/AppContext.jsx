@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { authService } from '../api/authService';
 import { projectService } from '../api/projectService';
@@ -245,8 +245,6 @@ export const AppProvider = ({ children }) => {
       }
     },
 
-
-
     async deleteTask(id) {
       try {
         await taskService.deleteTask(id);
@@ -259,7 +257,6 @@ export const AppProvider = ({ children }) => {
 
     clearState: () => dispatch({ type: ActionTypes.CLEAR_STATE }),
 
-    // Project Members actions
     async fetchProjectMembers(projectId) {
       try {
         dispatch({ type: ActionTypes.SET_LOADING, payload: true });
@@ -330,10 +327,10 @@ export const AppProvider = ({ children }) => {
 };
 
 // Custom hook to use the context
-export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
-  return context;
-};
+// export const useApp = () => {
+//   const context = useContext(AppContext);
+//   if (!context) {
+//     throw new Error('useApp must be used within an AppProvider');
+//   }
+//   return context;
+// };
