@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Save, X, Trash2 } from 'lucide-react';
-import { useApp } from "../store/useApp";
-import Modal from './Modal';
+import { useApp } from "../store/useApp";import Modal from './Modal';
 import './ProjectSettings.css';
 
 const ProjectSettings = ({ project, isVisible, onClose, onUpdate, onDelete }) => {
