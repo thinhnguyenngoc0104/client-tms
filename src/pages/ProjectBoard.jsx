@@ -16,13 +16,14 @@ const ProjectBoard = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const { state, actions } = useApp();
-  const { currentProject, tasks, loading, error, user } = state;
+  const { currentProject, tasks, error, user, projects } = state;
   const isAdmin = user ? actions.isAdmin() : false;
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [projectMembers, setProjectMembers] = useState([]);
+  const [tasksLoading, setTasksLoading] = useState(false);
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
@@ -34,6 +35,7 @@ const ProjectBoard = () => {
   const fetchProjectMembers = async () => {
     if (!projectId) return;
     try {
+
       const members = await actions.fetchProjectMembers(projectId);
       setProjectMembers(members);
     } catch (error) {
@@ -41,34 +43,40 @@ const ProjectBoard = () => {
     }
   };
 
-  console.log(tasks)
 
+  // Fetch projects, tasks & members when projectId changes
   useEffect(() => {
     if (!projectId) return;
 
     const fetchData = async () => {
-      await actions.fetchProjects();
-      await actions.fetchTasksByProject(projectId);
-      await fetchProjectMembers();
+      setTasksLoading(true);
+      actions.setTasks([]); // reset tasks
+      try {
+        await actions.fetchProjects();
+        await actions.fetchTasksByProject(projectId);
+        await fetchProjectMembers();
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setTasksLoading(false);
+      }
     };
 
     fetchData();
-  }, [projectId]); // Only run when project id changed
+  }, [projectId]);
 
-  // set current project but don't depends on currentProject to prevent loop
+  // Set current project based on projectId
   useEffect(() => {
-    if (!projectId || !state.projects.length) return;
-
-    const project = state.projects.find(p => p.id === parseInt(projectId));
+    if (!projectId || !projects.length) return;
+    const project = projects.find(p => p.id === parseInt(projectId));
     if (project && (!currentProject || currentProject.id !== project.id)) {
       actions.setCurrentProject(project);
     }
-  }, [projectId, state.projects]);
+  }, [projectId, projects]);
 
-  // loading check
   if (!user) return <Loading message="Loading user data..." />;
-  if (loading && tasks.length === 0) return <Loading message="Loading tasks..." />;
   if (!currentProject) return <Loading message="Loading project..." />;
+  if (tasksLoading) return <Loading message="Loading tasks..." />;
 
   const handleTaskDrop = async (taskId, newStatus) => {
     try {

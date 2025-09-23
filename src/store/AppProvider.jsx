@@ -26,8 +26,6 @@ export const AppProvider = ({ children }) => {
           await authService.syncProfile();
           const decoded = jwtDecode(idTokenClaims.__raw);
 
-          console.log(decoded);
-
           const userProfile = {
             pictureUrl: decoded.picture,
             name: decoded.name,

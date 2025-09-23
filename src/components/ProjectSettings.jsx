@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Save, X, Trash2 } from 'lucide-react';
-import { useApp } from "../store/useApp";import Modal from './Modal';
+import { useApp } from "../store/useApp"; import Modal from './Modal';
 import './ProjectSettings.css';
 
 const ProjectSettings = ({ project, isVisible, onClose, onUpdate, onDelete }) => {
-  const { state, actions } = useApp();
-  const { users } = state;
+  const { actions } = useApp();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -75,11 +74,6 @@ const ProjectSettings = ({ project, isVisible, onClose, onUpdate, onDelete }) =>
     onClose();
   };
 
-  const getOwnerName = (ownerId) => {
-    const owner = users.find(user => user.id === ownerId);
-    return owner ? (owner.name || owner.email) : `User ID: ${ownerId}`;
-  };
-
   if (!isVisible || !project) return null;
 
   return (
@@ -126,7 +120,7 @@ const ProjectSettings = ({ project, isVisible, onClose, onUpdate, onDelete }) =>
           <div className="form-group">
             <label>Project Owner</label>
             <div className="owner-display">
-              {getOwnerName(project?.owner_id || project?.ownerId)}
+              {project?.owner?.name}
             </div>
           </div>
 

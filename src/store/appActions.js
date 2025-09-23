@@ -84,6 +84,8 @@ export const createActions = (dispatch, ActionTypes, state) => ({
     }
   },
 
+  setTasks: (tasks) => dispatch({ type: ActionTypes.SET_TASKS, payload: tasks }),
+
   async createTask(taskData) {
     try {
       const newTask = await taskService.createTask(taskData);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Users, Plus, X, UserMinus, Trash2 } from 'lucide-react';
 import { useApp } from "../store/useApp";
 import Modal from './Modal';
@@ -15,15 +15,11 @@ const ProjectMembers = ({ projectId, isVisible, onClose, onUpdate }) => {
   const [selectedUserId, setSelectedUserId] = useState('');
   const isAdmin = actions.isAdmin();
 
-  useEffect(() => {
-    fetchMembers()
-  }, [projectId]);
-
   const fetchMembers = async () => {
+    if (!projectId) return;
     try {
       setLoading(true);
       const projectMembers = await actions.fetchProjectMembers(projectId);
-      console.log(projectMembers)
       setMembers(projectMembers);
     } catch (error) {
       console.error('Error fetching members:', error);
@@ -31,6 +27,10 @@ const ProjectMembers = ({ projectId, isVisible, onClose, onUpdate }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchMembers();
+  }, []);
 
   const handleAddMember = async (e) => {
     e.preventDefault();
@@ -59,9 +59,11 @@ const ProjectMembers = ({ projectId, isVisible, onClose, onUpdate }) => {
     }
   };
 
-  const availableUsers = users.filter(user =>
-    !members.some(member => member.id === user.id) && user.role !== 'ADMIN'
+  const availableUsers = useMemo(() =>
+    users.filter(user => !members.some(m => m.id === user.id) && user.role !== 'ADMIN'),
+    [users, members]
   );
+
   if (!isVisible) return null;
 
   return (
