@@ -4,6 +4,7 @@ import { authService } from '../api/authService';
 import { appReducer, initialState, ActionTypes } from "./appReducer";
 import { createActions } from "./appActions";
 import { AppContext } from "./AppContext";
+import { jwtDecode } from "jwt-decode";
 
 // Provider component
 export const AppProvider = ({ children }) => {
@@ -18,12 +19,21 @@ export const AppProvider = ({ children }) => {
           const token = await getAccessTokenSilently();
           // authService.setAuthToken(token);
           localStorage.setItem('auth_token', token);
-
           // Get ID Token
           const idTokenClaims = await getIdTokenClaims();
 
-          // Fetch user profile from backend
-          const userProfile = await authService.getProfile(idTokenClaims.__raw);
+          // Sync user to BE
+          await authService.syncProfile();
+          const decoded = jwtDecode(idTokenClaims.__raw);
+
+          console.log(decoded);
+
+          const userProfile = {
+            pictureUrl: decoded.picture,
+            name: decoded.name,
+            role: decoded["https://tms-api/roles"]?.[0] || "USER",
+            email: decoded.email,
+          };
           dispatch({ type: ActionTypes.SET_USER, payload: userProfile });
 
           // Store user role for easy access
