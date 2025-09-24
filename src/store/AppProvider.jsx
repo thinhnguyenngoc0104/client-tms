@@ -23,10 +23,11 @@ export const AppProvider = ({ children }) => {
           const idTokenClaims = await getIdTokenClaims();
 
           // Sync user to BE
-          await authService.syncProfile();
+          const userId = await authService.syncProfile();
           const decoded = jwtDecode(idTokenClaims.__raw);
 
           const userProfile = {
+            id: userId,
             pictureUrl: decoded.picture,
             name: decoded.name,
             role: decoded["https://tms-api/roles"]?.[0] || "USER",

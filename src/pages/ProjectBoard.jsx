@@ -158,7 +158,11 @@ const ProjectBoard = () => {
             {currentProject && (
               <button
                 className="project-members-btn"
-                onClick={() => setShowMembersModal(true)}
+                onClick={ async () => {
+                  setShowMembersModal(true);
+                  await actions.fetchUsers(); 
+                }
+              }
               >
                 <Users size={18} />
                 Members
