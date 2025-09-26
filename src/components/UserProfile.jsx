@@ -6,10 +6,14 @@ import './UserProfile.css';
 
 const UserProfile = () => {
   const { user: auth0User } = useAuth0();
-  const { state } = useApp();
+  const { state, actions } = useApp();
   const { user } = state;
+  const isImpersonating = actions.isImpersonating();
+  const originalUser = actions.getOriginalUser();
 
-  const displayUser = user || auth0User;
+  // When impersonating, show the original user (admin) in the profile
+  // When not impersonating, show the current user
+  const displayUser = isImpersonating ? originalUser : (user || auth0User);
 
   if (!displayUser) return null;
 

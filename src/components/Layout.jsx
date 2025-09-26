@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import UserProfile from './UserProfile';
 import LogoutButton from './LogoutButton';
+import ImpersonationIndicator from './ImpersonationIndicator';
 import './Layout.css';
 
 const Layout = ({ children }) => {
@@ -16,9 +17,10 @@ const Layout = ({ children }) => {
       <header className="layout-header">
         <div className="header-content">
           <div className="header-left">
+            <ImpersonationIndicator />
             <h1 className="app-title">TaskFlow</h1>
           </div>
-          
+
           <div className="header-right">
             <UserProfile />
             <LogoutButton />

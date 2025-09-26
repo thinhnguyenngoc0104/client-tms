@@ -33,7 +33,35 @@ export const AppProvider = ({ children }) => {
             role: decoded["https://tms-api/roles"]?.[0] || "USER",
             email: decoded.email,
           };
-          dispatch({ type: ActionTypes.SET_USER, payload: userProfile });
+
+          // Check if there's a saved impersonation state
+          const savedImpersonationState = localStorage.getItem('impersonation_state');
+          if (savedImpersonationState) {
+            try {
+              const impersonationData = JSON.parse(savedImpersonationState);
+              // Verify the original user matches the current authenticated user
+              if (impersonationData.originalUser?.id === userId) {
+                // Set the original user first
+                dispatch({ type: ActionTypes.SET_USER, payload: userProfile });
+
+                // Then start impersonation (this will handle localStorage update)
+                dispatch({
+                  type: ActionTypes.START_IMPERSONATION,
+                  payload: impersonationData.impersonatedUser
+                });
+              } else {
+                // Clear invalid impersonation state
+                localStorage.removeItem('impersonation_state');
+                dispatch({ type: ActionTypes.SET_USER, payload: userProfile });
+              }
+            } catch (error) {
+              console.error('Error restoring impersonation state:', error);
+              localStorage.removeItem('impersonation_state');
+              dispatch({ type: ActionTypes.SET_USER, payload: userProfile });
+            }
+          } else {
+            dispatch({ type: ActionTypes.SET_USER, payload: userProfile });
+          }
 
           // Store user role for easy access
           localStorage.setItem('user_role', userProfile.role);

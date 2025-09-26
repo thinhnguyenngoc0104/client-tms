@@ -70,6 +70,7 @@ const TaskDetail = ({ task, isVisible, onClose, onUpdate, onDelete, projectMembe
       console.error('Error deleting task:', error);
     } finally {
       setLoading(false);
+      setShowDeleteConfirm(false);
     }
   };
 

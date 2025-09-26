@@ -3,6 +3,7 @@ import { userService } from "../api/userService";
 import { projectService } from "../api/projectService";
 import { taskService } from "../api/taskService";
 import { projectMemberService } from "../api/projectMemberService";
+import { impersonationService } from "../api/impersonationService";
 
 export const createActions = (dispatch, ActionTypes, state) => ({
   setLoading: (loading) => dispatch({ type: ActionTypes.SET_LOADING, payload: loading }),
@@ -181,4 +182,81 @@ export const createActions = (dispatch, ActionTypes, state) => ({
     const taskAssigneeId = task.assignee_id || task.assigneeId;
     return state.user.role === "ADMIN" || taskAssigneeId === state.user.id;
   },
+
+  // Impersonation actions
+  async startImpersonation(userId) {
+    try {
+      dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+      const impersonatedUser = await impersonationService.getUserForImpersonation(userId);
+      await impersonationService.startImpersonation(userId);
+      dispatch({ type: ActionTypes.START_IMPERSONATION, payload: impersonatedUser });
+
+      console.log('Saving');
+      localStorage.setItem('impersonation_state', JSON.stringify({
+        originalUser: state.user,
+        impersonatedUser: impersonatedUser
+      }));
+
+      // Refresh projects for the impersonated user
+      try {
+        const projects = await projectService.getProjects();
+        dispatch({ type: ActionTypes.SET_PROJECTS, payload: projects });
+      } catch (projectError) {
+        console.error('Error refreshing projects after impersonation:', projectError);
+      }
+    } catch (error) {
+      dispatch({ type: ActionTypes.SET_ERROR, payload: error.message });
+    } finally {
+      dispatch({ type: ActionTypes.SET_LOADING, payload: false });
+    }
+  },
+
+  async stopImpersonation() {
+    try {
+      dispatch({ type: ActionTypes.SET_LOADING, payload: true });
+      await impersonationService.stopImpersonation();
+
+      // Get the original user before stopping impersonation
+      const originalUser = state.originalUser;
+
+      dispatch({ type: ActionTypes.STOP_IMPERSONATION });
+
+      // If we have the original user data, make sure it's properly set
+      if (originalUser) {
+        dispatch({ type: ActionTypes.SET_USER, payload: originalUser });
+      }
+
+      // Clear impersonation state from localStorage
+      localStorage.removeItem('impersonation_state');
+
+      // Refresh projects for the original user
+      try {
+        const projects = await projectService.getProjects();
+        dispatch({ type: ActionTypes.SET_PROJECTS, payload: projects });
+      } catch (projectError) {
+        console.error('Error refreshing projects after stopping impersonation:', projectError);
+      }
+
+      // Refresh users list to ensure users column is updated
+      try {
+        const users = await userService.getUsers();
+        dispatch({ type: ActionTypes.SET_USERS, payload: users });
+      } catch (usersError) {
+        console.error('Error refreshing users after stopping impersonation:', usersError);
+      }
+    } catch (error) {
+      dispatch({ type: ActionTypes.SET_ERROR, payload: error.message });
+    } finally {
+      dispatch({ type: ActionTypes.SET_LOADING, payload: false });
+    }
+  },
+
+  // Helper to check if currently impersonating
+  isImpersonating: () => state.isImpersonating,
+
+  // Helper to get original user (admin who started impersonation)
+  getOriginalUser: () => state.originalUser,
+
+  // Helper to get impersonated user
+  getImpersonatedUser: () => state.impersonatedUser,
 });

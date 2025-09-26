@@ -75,6 +75,29 @@ export const appReducer = (state, action) => {
         ...state,
         tasks: state.tasks.filter(t => t.id !== action.payload),
       };
+    case ActionTypes.START_IMPERSONATION: {
+      // Ensure we have the complete original user data
+      const originalUser = state.originalUser || state.user;
+      const newState = {
+        ...state,
+        isImpersonating: true,
+        originalUser: originalUser,
+        impersonatedUser: action.payload,
+        user: action.payload, // Switch current user to impersonated user
+      };
+
+      return newState;
+    }
+    case ActionTypes.STOP_IMPERSONATION: {
+      const newState = {
+        ...state,
+        isImpersonating: false,
+        user: state.originalUser, // Restore original user
+        originalUser: null,
+        impersonatedUser: null,
+      };
+      return newState;
+    }
     case ActionTypes.CLEAR_STATE:
       return initialState;
     default:
