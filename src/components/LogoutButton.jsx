@@ -12,7 +12,9 @@ const LogoutButton = () => {
     <button
       className="auth-button logout-button"
       onClick={() => {
-        actions.stopImpersonation();
+        if (actions.isAdmin()) {
+          actions.stopImpersonation();
+        }
         localStorage.removeItem('impersonation_state');
         logout({
           logoutParams: {
