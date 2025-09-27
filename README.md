@@ -70,31 +70,9 @@ A modern, responsive Single Page Application (SPA) built with React that provide
    ```
 
 3. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   ```
+   Download .env from [.env](https://drive.google.com/file/d/1av6a_T_lsWDUPHb5e3jFNQO--qVQUTAm/view?usp=drive_link)
 
-   Update `.env` with your Auth0 and API configuration:
-   ```env
-   REACT_APP_AUTH0_DOMAIN=your-auth0-domain.auth0.com
-   REACT_APP_AUTH0_CLIENT_ID=your-auth0-client-id
-   REACT_APP_AUTH0_AUDIENCE=your-api-identifier
-   REACT_APP_API_BASE_URL=http://localhost:3001
-   ```
-
-4. **Auth0 Configuration**
-   - Create an Auth0 application (Single Page Application)
-   - Configure allowed callback URLs: `http://localhost:5173`
-   - Configure allowed logout URLs: `http://localhost:5173`
-   - Configure allowed web origins: `http://localhost:5173`
-   - Enable the Auth0 Management API if needed
-
-5. **Start the development server**
+5. **Start the local development server**
    ```bash
    npm run dev
-   ```
-
-6. **Build for production**
-   ```bash
-   npm run build
    ```
